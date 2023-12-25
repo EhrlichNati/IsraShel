@@ -2,7 +2,7 @@ from geopy.geocoders import Nominatim
 import folium
 
 
-def names_to_geo_points(self, cities: list[str]) -> list[tuple[float, float]]:
+def names_to_geo_points(cities: list[str]) -> list[tuple[float, float]]:
     geolocator = Nominatim(user_agent="city_to_coordinates")
     coordinates = []
 
