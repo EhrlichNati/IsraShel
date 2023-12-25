@@ -1,41 +1,47 @@
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
-import re
+import os
+
+# URL to scrape
+url = 'https://he.wikipedia.org/wiki/ערים_בישראל'
 
 
-# Table with no links inside
-"""
-url = 'https://www.rishonlezion.muni.il/Residents/SecurityEmergency/Pages/Publicshelter.aspx'
+# Extract the part of the URL after 'www.'
+url_parts = url.split('/')
+domain_name = url_parts[2].split('.')[1]  # Gets the part after 'www.'
 
-#Patch data
+# Create a directory name
+directory_name = f'{domain_name} ({url})'
+directory_path = os.path.join('/Users/netanelerlich/PycharmProjects/IsraShel/test_data', directory_name)
+
+# Create the directory if it does not exist
+if not os.path.exists(directory_path):
+    os.makedirs(directory_path)
+
+# Fetch data
 response = requests.get(url)
 soup = BeautifulSoup(response.content, 'html.parser')
 
-table = soup.find('table')
-rows = table.find_all('tr')
+# Find all tables
+tables = soup.find_all('table')
 
-#Orgenize in table
-data = []
-for row in rows:
-    cols = row.find_all(['td', 'th'])
-    cols = [ele.get_text(strip=True) for ele in cols]
-    data.append(cols)
-df = pd.DataFrame(data)
+# Process each table
+for num_table, table in enumerate(tables):
+    rows = table.find_all('tr')
+    table_data = []
+    for row in rows:
+        cols = row.find_all(['td', 'th'])
+        cols = [ele.get_text(strip=True) for ele in cols]
+        table_data.append(cols)
+    df = pd.DataFrame(table_data)
 
-# Specific modulations
+    # Define file path
+    file_name = f'{domain_name}_{num_table}.csv'
+    file_path = os.path.join(directory_path, file_name)
 
-df = pd.DataFrame(data).iloc[1:]
-df = df.drop(columns=[5, 6])
-df.rename(columns={0: "Shelter Num.", 1: 'Address', 2: 'Neighborhood', 3: 'Capacity', 4: 'Accessibility'}, inplace=True)
-
-#Extract name
-url_parts = url.split('.')
-city_name = url_parts[1]
-
-df.to_csv(f'/Users/netanelerlich/PycharmProjects/IsraShel/test_data/miklatim_{city_name}.csv', index=False)
-
-"""
+    # Save to CSV
+    df.to_csv(file_path, index=False)
 
 # With links inside the table
 """
@@ -78,11 +84,5 @@ city_name = url_parts[1]
 
 df.to_csv(f'/Users/netanelerlich/PycharmProjects/IsraShel/test_data/miklatim_{city_name}.csv', index=False)
 """
-
-
-
-
-
-
 
 

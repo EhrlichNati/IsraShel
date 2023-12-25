@@ -1,5 +1,5 @@
 import folium
-import city_analysis as pf
+import cities as pf
 
 
 # TODO: insert to config
